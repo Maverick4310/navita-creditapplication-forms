@@ -24,49 +24,122 @@
         <h1 id="title">Personal Guarantor Form</h1>
         <p class="hint">Please complete the fields below. This is a secure link.</p>
 
-        <form id="pgForm">
+        <form id="pgForm" novalidate>
           <div class="grid">
+
+            <!-- REQUIRED -->
             <div class="field">
-              <label>First Name</label>
-              <input name="firstName" autocomplete="given-name" required />
-            </div>
-            <div class="field">
-              <label>Last Name</label>
-              <input name="lastName" autocomplete="family-name" required />
-            </div>
-            <div class="field">
-              <label>Email</label>
-              <input name="email" type="email" autocomplete="email" required />
-            </div>
-            <div class="field">
-              <label>Phone</label>
-              <input name="phone" autocomplete="tel" />
+              <label for="firstName">First Name <span class="req">*</span></label>
+              <input id="firstName" name="firstName" autocomplete="given-name" required />
             </div>
 
-            <div class="field full">
-              <label>Address</label>
-              <input name="address" autocomplete="street-address" />
-            </div>
+            <!-- REQUIRED -->
             <div class="field">
-              <label>City</label>
-              <input name="city" autocomplete="address-level2" />
+              <label for="lastName">Last Name <span class="req">*</span></label>
+              <input id="lastName" name="lastName" autocomplete="family-name" required />
             </div>
+
+            <!-- REQUIRED -->
             <div class="field">
-              <label>State</label>
-              <input name="state" autocomplete="address-level1" />
+              <label for="ssn">SSN <span class="req">*</span></label>
+              <input
+                id="ssn"
+                name="ssn"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="123-45-6789"
+                required
+              />
+              <div class="help">Enter 9 digits (dashes optional).</div>
             </div>
+
+            <!-- REQUIRED -->
             <div class="field">
-              <label>ZIP</label>
-              <input name="zip" autocomplete="postal-code" />
+              <label for="email">Email <span class="req">*</span></label>
+              <input id="email" name="email" type="email" autocomplete="email" required />
             </div>
+
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" autocomplete="tel" />
+            </div>
+
+            <div class="field">
+              <label for="ownershipPct">Ownership %</label>
+              <input
+                id="ownershipPct"
+                name="ownershipPct"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="e.g., 25"
+              />
+              <div class="help">0–100 (optional).</div>
+            </div>
+
+            <!-- Address split -->
+            <div class="field">
+              <label for="streetNumber">Street Number</label>
+              <input id="streetNumber" name="streetNumber" inputmode="numeric" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label for="streetName">Street Name</label>
+              <input id="streetName" name="streetName" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label for="streetType">Street Type</label>
+              <select id="streetType" name="streetType">
+                <option value="">Select…</option>
+                <option value="St">St</option>
+                <option value="Ave">Ave</option>
+                <option value="Blvd">Blvd</option>
+                <option value="Dr">Dr</option>
+                <option value="Ln">Ln</option>
+                <option value="Rd">Rd</option>
+                <option value="Ct">Ct</option>
+                <option value="Cir">Cir</option>
+                <option value="Pkwy">Pkwy</option>
+                <option value="Way">Way</option>
+                <option value="Pl">Pl</option>
+                <option value="Ter">Ter</option>
+                <option value="Hwy">Hwy</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- REQUIRED -->
+            <div class="field">
+              <label for="city">City <span class="req">*</span></label>
+              <input id="city" name="city" autocomplete="address-level2" required />
+            </div>
+
+            <div class="field">
+              <label for="state">State</label>
+              <input id="state" name="state" autocomplete="address-level1" />
+            </div>
+
+            <!-- REQUIRED -->
+            <div class="field">
+              <label for="zip">ZIP <span class="req">*</span></label>
+              <input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" required />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="disclosure">
+            By clicking the &quot;SUBMIT&quot; button below, I/we hereby authorize the release of any and all credit information from the above listed references, and certify that all is true and correct to the best of my/our knowledge. The listed individual(s), recognizing that his/her/their individual credit histories may be a factor in the evaluation of the credit applicant, hereby consent(s) to and authorize(s) the credit provider (Navitas Credit Corp. or its assignees) to obtain and use a consumer credit report on the listed individuals, now and from time to time, as may be needed in the credit evaluation and review process and waives any right or claim they would otherwise have under the Fair Credit Reporting Act in the absence of this continuing consent.
           </div>
 
           <div class="actions">
-            <button id="submitBtn" type="submit">Submit</button>
+            <button id="submitBtn" type="submit">SUBMIT</button>
           </div>
 
           <div class="fineprint">
-            By submitting, you confirm the information is accurate.
+            <span class="req">*</span> Required fields
           </div>
         </form>
       </div>
