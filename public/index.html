@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Navitas | Personal Guarantor Form</title>
   <style>
+    /* Styles from original HTML - keeping these intact */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -46,6 +47,18 @@
       background: #fef3cd;
       border-left: 4px solid #ffc107;
       color: #856404;
+    }
+
+    .banner.ok {
+      background: #d4edda;
+      border-left-color: #28a745;
+      color: #155724;
+    }
+
+    .banner.err {
+      background: #f8d7da;
+      border-left-color: #dc3545;
+      color: #721c24;
     }
 
     .banner.hidden {
@@ -173,6 +186,18 @@
       color: #999;
     }
 
+    .field input.invalid,
+    .field select.invalid {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+    }
+
+    .field-error {
+      font-size: 0.7rem;
+      color: #dc3545;
+      margin-top: 4px;
+    }
+
     .help {
       font-size: 0.7rem;
       color: #999;
@@ -241,13 +266,18 @@
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    #submitBtn:hover {
+    #submitBtn:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
     }
 
-    #submitBtn:active {
+    #submitBtn:active:not(:disabled) {
       transform: translateY(0);
+    }
+
+    #submitBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .fineprint {
@@ -263,15 +293,17 @@
     <div class="card">
       <div class="header">
         <div class="brand">Navitas Credit Corp.</div>
+        <div class="sub">Personal Guarantor Form</div>
       </div>
 
       <div id="banner" class="banner hidden"></div>
 
       <div class="content">
-        <h1 id="title">Personal Guarantor Form</h1>
+        <h1 id="title">Personal Guarantor Information</h1>
         <p class="hint">Please complete the fields below. This is a secure link.</p>
 
-        <form id="pgForm" novalidate>
+        <!-- Added method="POST" to prevent data in URL -->
+        <form id="pgForm" method="POST" action="#" novalidate>
           <div id="guarantorsContainer">
             <!-- First Guarantor (cannot be removed) -->
             <div class="guarantor-section" data-guarantor="1">
@@ -362,30 +394,29 @@
                   <input id="city_1" name="guarantors[0][city]" autocomplete="address-level2" required />
                 </div>
 
-    <div class="field">
-  <label for="state_${guarantorCount}">State <span class="req">*</span></label>
-  <select id="state_${guarantorCount}" name="guarantors[${guarantorCount - 1}][state]" autocomplete="address-level1" required>
-    <option value="">Select…</option>
-    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
-    <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
-    <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
-    <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
-    <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
-    <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
-    <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
-    <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
-    <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
-    <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
-    <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
-    <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
-    <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
-    <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
-    <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
-    <option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
-    <option value="WI">WI</option><option value="WY">WY</option>
-  </select>
-</div>
-
+                <div class="field">
+                  <label for="state_1">State <span class="req">*</span></label>
+                  <select id="state_1" name="guarantors[0][state]" autocomplete="address-level1" required>
+                    <option value="">Select…</option>
+                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+                    <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+                    <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
+                    <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
+                    <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
+                    <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
+                    <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
+                    <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
+                    <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
+                    <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
+                    <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
+                    <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
+                    <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
+                    <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
+                    <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
+                    <option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
+                    <option value="WI">WI</option><option value="WY">WY</option>
+                  </select>
+                </div>
 
                 <div class="field">
                   <label for="zip_1">ZIP <span class="req">*</span></label>
@@ -404,155 +435,23 @@
 
           <div class="divider"></div>
 
+          <div class="disclosure">
+            By clicking the "SUBMIT" button below, I/we hereby authorize the release of any and all credit information from the above listed references, and certify that all is true and correct to the best of my/our knowledge. The listed individual(s), recognizing that his/her/their individual credit histories may be a factor in the evaluation of the credit applicant, hereby consent(s) to and authorize(s) the credit provider (Navitas Credit Corp. or its assignees) to obtain and use a consumer credit report on the listed individuals, now and from time to time, as may be needed in the credit evaluation and review process and waives any right or claim they would otherwise have under the Fair Credit Reporting Act in the absence of this continuing consent.
+          </div>
+
           <div class="actions">
-            <button id="submitBtn" type="submit">SUBMIT</button>
+            <!-- Submit button starts disabled until validation passes -->
+            <button id="submitBtn" type="submit" disabled>SUBMIT</button>
           </div>
 
           <div class="fineprint">
             <span class="req">*</span> Required fields
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="disclosure">
-            By clicking the "SUBMIT" button below, I/we hereby authorize the release of any and all credit information from the above listed references, and certify that all is true and correct to the best of my/our knowledge. The listed individual(s), recognizing that his/her/their individual credit histories may be a factor in the evaluation of the credit applicant, hereby consent(s) to and authorize(s) the credit provider (Navitas Credit Corp. or its assignees) to obtain and use a consumer credit report on the listed individuals, now and from time to time, as may be needed in the credit evaluation and review process and waives any right or claim they would otherwise have under the Fair Credit Reporting Act in the absence of this continuing consent.
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <script>
-    let guarantorCount = 1;
-
-    document.getElementById('addGuarantorBtn').addEventListener('click', function() {
-      guarantorCount++;
-      const container = document.getElementById('guarantorsContainer');
-      
-      const section = document.createElement('div');
-      section.className = 'guarantor-section';
-      section.dataset.guarantor = guarantorCount;
-      
-      section.innerHTML = `
-        <div class="guarantor-header">
-          <span class="guarantor-title">Personal Guarantor ${guarantorCount}</span>
-          <button type="button" class="remove-btn" onclick="removeGuarantor(this)">Remove</button>
-        </div>
-        <div class="grid">
-          <div class="field">
-            <label for="firstName_${guarantorCount}">First Name <span class="req">*</span></label>
-            <input id="firstName_${guarantorCount}" name="guarantors[${guarantorCount - 1}][firstName]" autocomplete="given-name" required />
-          </div>
-
-          <div class="field">
-            <label for="lastName_${guarantorCount}">Last Name <span class="req">*</span></label>
-            <input id="lastName_${guarantorCount}" name="guarantors[${guarantorCount - 1}][lastName]" autocomplete="family-name" required />
-          </div>
-
-          <div class="field">
-            <label for="ssn_${guarantorCount}">SSN <span class="req">*</span></label>
-            <input
-              id="ssn_${guarantorCount}"
-              name="guarantors[${guarantorCount - 1}][ssn]"
-              inputmode="numeric"
-              autocomplete="off"
-              placeholder="123-45-6789"
-              required
-            />
-            <div class="help">Enter 9 digits (dashes optional).</div>
-          </div>
-
-          <div class="field">
-            <label for="email_${guarantorCount}">Email <span class="req">*</span></label>
-            <input id="email_${guarantorCount}" name="guarantors[${guarantorCount - 1}][email]" type="email" autocomplete="email" required />
-          </div>
-
-          <div class="field">
-            <label for="phone_${guarantorCount}">Phone</label>
-            <input id="phone_${guarantorCount}" name="guarantors[${guarantorCount - 1}][phone]" autocomplete="tel" />
-          </div>
-
-          <div class="field">
-            <label for="ownershipPct_${guarantorCount}">Ownership %</label>
-            <input
-              id="ownershipPct_${guarantorCount}"
-              name="guarantors[${guarantorCount - 1}][ownershipPct]"
-              type="number"
-              min="0"
-              max="100"
-              step="0.01"
-              placeholder="e.g., 25"
-            />
-            <div class="help">0–100 (optional).</div>
-          </div>
-
-          <div class="field">
-            <label for="streetNumber_${guarantorCount}">Street Number <span class="req">*</span></label>
-            <input id="streetNumber_${guarantorCount}" name="guarantors[${guarantorCount - 1}][streetNumber]" inputmode="numeric" autocomplete="off" required />
-          </div>
-
-          <div class="field">
-            <label for="streetName_${guarantorCount}">Street Name <span class="req">*</span></label>
-            <input id="streetName_${guarantorCount}" name="guarantors[${guarantorCount - 1}][streetName]" autocomplete="off" required />
-          </div>
-
-          <div class="field">
-            <label for="streetType_${guarantorCount}">Street Type <span class="req">*</span></label>
-            <select id="streetType_${guarantorCount}" name="guarantors[${guarantorCount - 1}][streetType]" required>
-              <option value="">Select…</option>
-              <option value="St">St</option>
-              <option value="Ave">Ave</option>
-              <option value="Blvd">Blvd</option>
-              <option value="Dr">Dr</option>
-              <option value="Ln">Ln</option>
-              <option value="Rd">Rd</option>
-              <option value="Ct">Ct</option>
-              <option value="Cir">Cir</option>
-              <option value="Pkwy">Pkwy</option>
-              <option value="Way">Way</option>
-              <option value="Pl">Pl</option>
-              <option value="Ter">Ter</option>
-              <option value="Hwy">Hwy</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="city_${guarantorCount}">City <span class="req">*</span></label>
-            <input id="city_${guarantorCount}" name="guarantors[${guarantorCount - 1}][city]" autocomplete="address-level2" required />
-          </div>
-
-          <div class="field">
-            <label for="state_${guarantorCount}">State <span class="req">*</span></label>
-            <input id="state_${guarantorCount}" name="guarantors[${guarantorCount - 1}][state]" autocomplete="address-level1" required />
-          </div>
-
-          <div class="field">
-            <label for="zip_${guarantorCount}">ZIP <span class="req">*</span></label>
-            <input id="zip_${guarantorCount}" name="guarantors[${guarantorCount - 1}][zip]" inputmode="numeric" autocomplete="postal-code" required />
-          </div>
-        </div>
-      `;
-      
-      container.appendChild(section);
-      
-      // Scroll to the new section
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-
-    function removeGuarantor(btn) {
-      const section = btn.closest('.guarantor-section');
-      section.remove();
-      updateGuarantorNumbers();
-    }
-
-    function updateGuarantorNumbers() {
-      const sections = document.querySelectorAll('.guarantor-section');
-      sections.forEach((section, index) => {
-        const title = section.querySelector('.guarantor-title');
-        title.textContent = `Personal Guarantor ${index + 1}`;
-      });
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
