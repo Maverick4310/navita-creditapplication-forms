@@ -428,6 +428,31 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const payload = buildPayloadFromForm(form, token);
 
+      // DEBUG: Log payload being sent to Apex
+      console.group('🔍 DEBUG: Payload to Apex');
+      console.log('Full payload:', JSON.stringify(payload, null, 2));
+      console.log('Token:', payload.token);
+      console.log('Guarantor count:', payload.guarantors?.length);
+      payload.guarantors?.forEach((g, i) => {
+        console.group(`Guarantor #${i + 1}`);
+        console.table({
+          firstName: g.firstName || '❌ NULL/EMPTY',
+          lastName: g.lastName || '❌ NULL/EMPTY',
+          ssn: g.ssn ? '✓ SET' : '❌ NULL/EMPTY',
+          email: g.email || '❌ NULL/EMPTY',
+          phone: g.phone || '(not provided)',
+          ownershipPct: g.ownershipPct ?? '(not provided)',
+          streetNumber: g.streetNumber || '❌ NULL/EMPTY',
+          streetName: g.streetName || '❌ NULL/EMPTY',
+          streetType: g.streetType || '❌ NULL/EMPTY',
+          city: g.city || '❌ NULL/EMPTY',
+          state: g.state || '❌ NULL/EMPTY',
+          zip: g.zip || '❌ NULL/EMPTY'
+        });
+        console.groupEnd();
+      });
+      console.groupEnd();
+
       const resp = await fetch(SF_ENDPOINT, {
         method: "POST",
         headers: {
