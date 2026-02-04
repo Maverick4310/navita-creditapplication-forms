@@ -173,6 +173,7 @@ function buildPayloadFromForm(form, token) {
 
       // Normalize empty optional fields
       if (g.phone === "") delete g.phone;
+      if (g.dateOfBirth === "") delete g.dateOfBirth;
 
       return g;
     });
@@ -199,6 +200,7 @@ function showConfirmationUI() {
 
 /**
  * Generate HTML for a new guarantor section
+ * Includes Date of Birth field
  */
 function createGuarantorHTML(index) {
   return `
@@ -228,6 +230,16 @@ function createGuarantorHTML(index) {
           required
         />
         <div class="help">Enter 9 digits (dashes optional).</div>
+      </div>
+
+      <div class="field">
+        <label for="dateOfBirth_${index}">Date of Birth</label>
+        <input
+          id="dateOfBirth_${index}"
+          name="guarantors[${index - 1}][dateOfBirth]"
+          type="date"
+          autocomplete="bday"
+        />
       </div>
 
       <div class="field">
@@ -439,6 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
           firstName: g.firstName || '❌ NULL/EMPTY',
           lastName: g.lastName || '❌ NULL/EMPTY',
           ssn: g.ssn ? '✓ SET' : '❌ NULL/EMPTY',
+          dateOfBirth: g.dateOfBirth || '(not provided)',
           email: g.email || '❌ NULL/EMPTY',
           phone: g.phone || '(not provided)',
           ownershipPct: g.ownershipPct ?? '(not provided)',
