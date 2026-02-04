@@ -204,6 +204,13 @@
       margin-top: 4px;
     }
 
+    /* Fix for date input appearance */
+    .field input[type="date"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
     .add-guarantor-btn {
       display: flex;
       align-items: center;
@@ -332,6 +339,16 @@
                     required
                   />
                   <div class="help">Enter 9 digits (dashes optional).</div>
+                </div>
+
+                <div class="field">
+                  <label for="dateOfBirth_1">Date of Birth</label>
+                  <input
+                    id="dateOfBirth_1"
+                    name="guarantors[0][dateOfBirth]"
+                    type="date"
+                    autocomplete="bday"
+                  />
                 </div>
 
                 <div class="field">
