@@ -4,23 +4,197 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Navitas | Personal Guarantor Form</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #0d5c6e 0%, #1a8a9e 100%);
+      color: #fff;
+      padding: 24px 32px;
+    }
+
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .banner {
+      padding: 12px 24px;
+      background: #fef3cd;
+      border-left: 4px solid #ffc107;
+      color: #856404;
+    }
+
+    .banner.hidden {
+      display: none;
+    }
+
+    .content {
+      padding: 32px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .hint {
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .req {
+      color: #dc3545;
+    }
+
+    .field input,
+    .field select {
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #fff;
+      color: #333;
+      height: 46px;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: #1a8a9e;
+      box-shadow: 0 0 0 3px rgba(26, 138, 158, 0.15);
+    }
+
+    .field input::placeholder {
+      color: #999;
+    }
+
+    .help {
+      font-size: 0.7rem;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e5e5e5;
+      margin: 28px 0;
+    }
+
+    .disclosure {
+      font-size: 0.7rem;
+      color: #999;
+      line-height: 1.5;
+      margin-bottom: 28px;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 6px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    #submitBtn {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: #fff;
+      border: none;
+      padding: 14px 48px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #submitBtn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    #submitBtn:active {
+      transform: translateY(0);
+    }
+
+    .fineprint {
+      font-size: 0.75rem;
+      color: #999;
+      margin-top: 16px;
+      text-align: right;
+    }
+  </style>
 </head>
 <body>
   <div class="page">
     <div class="card">
       <div class="header">
         <div class="brand">Navitas Credit Corp.</div>
-        <div class="sub">Secure Form</div>
       </div>
 
       <div id="banner" class="banner hidden"></div>
 
       <div class="content">
-        <div class="meta">
-          <div><span class="label">Token:</span> <span id="tokenValue"></span></div>
-        </div>
-
         <h1 id="title">Personal Guarantor Form</h1>
         <p class="hint">Please complete the fields below. This is a secure link.</p>
 
@@ -78,20 +252,22 @@
               <div class="help">0–100 (optional).</div>
             </div>
 
-            <!-- Address split -->
+            <!-- REQUIRED - Address split -->
             <div class="field">
-              <label for="streetNumber">Street Number</label>
-              <input id="streetNumber" name="streetNumber" inputmode="numeric" autocomplete="off" />
+              <label for="streetNumber">Street Number <span class="req">*</span></label>
+              <input id="streetNumber" name="streetNumber" inputmode="numeric" autocomplete="off" required />
             </div>
 
+            <!-- REQUIRED -->
             <div class="field">
-              <label for="streetName">Street Name</label>
-              <input id="streetName" name="streetName" autocomplete="off" />
+              <label for="streetName">Street Name <span class="req">*</span></label>
+              <input id="streetName" name="streetName" autocomplete="off" required />
             </div>
 
+            <!-- REQUIRED -->
             <div class="field">
-              <label for="streetType">Street Type</label>
-              <select id="streetType" name="streetType">
+              <label for="streetType">Street Type <span class="req">*</span></label>
+              <select id="streetType" name="streetType" required>
                 <option value="">Select…</option>
                 <option value="St">St</option>
                 <option value="Ave">Ave</option>
@@ -130,16 +306,18 @@
 
           <div class="divider"></div>
 
-          <div class="disclosure">
-            By clicking the &quot;SUBMIT&quot; button below, I/we hereby authorize the release of any and all credit information from the above listed references, and certify that all is true and correct to the best of my/our knowledge. The listed individual(s), recognizing that his/her/their individual credit histories may be a factor in the evaluation of the credit applicant, hereby consent(s) to and authorize(s) the credit provider (Navitas Credit Corp. or its assignees) to obtain and use a consumer credit report on the listed individuals, now and from time to time, as may be needed in the credit evaluation and review process and waives any right or claim they would otherwise have under the Fair Credit Reporting Act in the absence of this continuing consent.
-          </div>
-
           <div class="actions">
             <button id="submitBtn" type="submit">SUBMIT</button>
           </div>
 
           <div class="fineprint">
             <span class="req">*</span> Required fields
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="disclosure">
+            By clicking the "SUBMIT" button below, I/we hereby authorize the release of any and all credit information from the above listed references, and certify that all is true and correct to the best of my/our knowledge. The listed individual(s), recognizing that his/her/their individual credit histories may be a factor in the evaluation of the credit applicant, hereby consent(s) to and authorize(s) the credit provider (Navitas Credit Corp. or its assignees) to obtain and use a consumer credit report on the listed individuals, now and from time to time, as may be needed in the credit evaluation and review process and waives any right or claim they would otherwise have under the Fair Credit Reporting Act in the absence of this continuing consent.
           </div>
         </form>
       </div>
