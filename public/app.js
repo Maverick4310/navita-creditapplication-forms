@@ -1,7 +1,8 @@
 // app.js
 
 const SF_ENDPOINT =
-  "https://navitascredit.my.salesforce-sites.com/creditapp/services/apexrest/externalform/pg";
+ // "https://navitascredit.my.salesforce-sites.com/creditapp/services/apexrest/externalform/pg";
+  "https://navitascredit--IFSNAV19.sandbox.my.salesforce-sites.com/creditapp/services/apexrest/externalform/pg";
 
 // ZIP lookup endpoint (same base, different method)
 const SF_ZIP_ENDPOINT = SF_ENDPOINT + "?zip=";
