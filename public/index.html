@@ -293,6 +293,85 @@
       margin-top: 16px;
       text-align: right;
     }
+
+    /* Readonly field styling */
+    .field input[readonly] {
+      background: #f5f5f5;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    /* City selection dropdown */
+    .city-select-wrapper {
+      position: relative;
+    }
+
+    .city-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid #1a8a9e;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 100;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 4px;
+    }
+
+    .city-options.hidden {
+      display: none;
+    }
+
+    .city-option {
+      padding: 12px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: background 0.2s;
+    }
+
+    .city-option:last-child {
+      border-bottom: none;
+    }
+
+    .city-option:hover {
+      background: #e8f4f6;
+    }
+
+    .city-option-name {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .city-option-detail {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    /* Loading indicator for ZIP lookup */
+    .zip-loading {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      border: 2px solid #e0e0e0;
+      border-top-color: #1a8a9e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    .field.zip-field {
+      position: relative;
+    }
   </style>
 </head>
 <body>
@@ -408,38 +487,23 @@
                   </select>
                 </div>
 
-                <div class="field">
+                <div class="field city-select-wrapper">
                   <label for="city_1">City <span class="req">*</span></label>
-                  <input id="city_1" name="guarantors[0][city]" autocomplete="address-level2" required />
+                  <input id="city_1" name="guarantors[0][city]" autocomplete="off" required readonly />
+                  <div class="help">Auto-filled from ZIP code.</div>
+                  <div id="cityOptions_1" class="city-options hidden"></div>
                 </div>
 
                 <div class="field">
                   <label for="state_1">State <span class="req">*</span></label>
-                  <select id="state_1" name="guarantors[0][state]" autocomplete="address-level1" required>
-                    <option value="">Select…</option>
-                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
-                    <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
-                    <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
-                    <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
-                    <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
-                    <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
-                    <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
-                    <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
-                    <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
-                    <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
-                    <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
-                    <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
-                    <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
-                    <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
-                    <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
-                    <option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
-                    <option value="WI">WI</option><option value="WY">WY</option>
-                  </select>
+                  <input id="state_1" name="guarantors[0][state]" autocomplete="off" required readonly />
+                  <div class="help">Auto-filled from ZIP code.</div>
                 </div>
 
-                <div class="field">
+                <div class="field zip-field">
                   <label for="zip_1">ZIP <span class="req">*</span></label>
-                  <input id="zip_1" name="guarantors[0][zip]" inputmode="numeric" autocomplete="postal-code" required />
+                  <input id="zip_1" name="guarantors[0][zip]" inputmode="numeric" autocomplete="postal-code" maxlength="10" required />
+                  <div class="help">Enter ZIP to auto-fill city/state.</div>
                 </div>
               </div>
             </div>
