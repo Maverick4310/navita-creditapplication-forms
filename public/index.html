@@ -336,6 +336,7 @@
                     inputmode="numeric"
                     autocomplete="off"
                     placeholder="123-45-6789"
+                    minlength="9"
                     required
                   />
                   <div class="help">Enter 9 digits (dashes optional).</div>
@@ -358,7 +359,8 @@
 
                 <div class="field">
                   <label for="phone_1">Phone</label>
-                  <input id="phone_1" name="guarantors[0][phone]" autocomplete="tel" />
+                  <input id="phone_1" name="guarantors[0][phone]" autocomplete="tel" minlength="10" />
+                  <div class="help">Minimum 10 digits if provided.</div>
                 </div>
 
                 <div class="field">
