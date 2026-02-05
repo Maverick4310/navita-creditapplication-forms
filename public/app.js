@@ -213,12 +213,21 @@ async function lookupZip(zip) {
       headers: { "Content-Type": "application/json" }
     });
     
-    if (!resp.ok) return null;
+    if (!resp.ok) {
+      console.error('ZIP lookup HTTP error:', resp.status);
+      return null;
+    }
     
     const data = await resp.json();
+    
+    // Debug: log the response
+    console.log('ZIP lookup response:', data);
+    
     if (data.success && data.results && data.results.length > 0) {
       return data.results;
     }
+    
+    console.log('ZIP lookup failed:', data.message || 'No results');
     return null;
   } catch (err) {
     console.error("ZIP lookup error:", err);
