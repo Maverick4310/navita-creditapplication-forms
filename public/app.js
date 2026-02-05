@@ -3,6 +3,9 @@
 const SF_ENDPOINT =
   "https://navitascredit--IFSNAV19.sandbox.my.salesforce-sites.com/creditapp/services/apexrest/externalform/pg";
 
+// ZIP lookup endpoint (same base, different method)
+const SF_ZIP_ENDPOINT = SF_ENDPOINT + "?zip=";
+
 // Email validation regex pattern
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -60,7 +63,27 @@ function isValidEmail(value) {
 }
 
 /**
- * Check if all required fields are filled and emails are valid
+ * Validate SSN - must have exactly 9 digits
+ * Returns true if valid, false if invalid
+ */
+function isValidSSN(value) {
+  const digitsOnly = value.replace(/\D/g, '');
+  return digitsOnly.length === 9;
+}
+
+/**
+ * Validate phone - must have at least 10 digits if provided
+ * Returns true if valid (or empty), false if invalid
+ */
+function isValidPhone(value) {
+  const trimmed = value.trim();
+  if (!trimmed) return true; // Phone is optional
+  const digitsOnly = trimmed.replace(/\D/g, '');
+  return digitsOnly.length >= 10;
+}
+
+/**
+ * Check if all required fields are filled and emails/SSN/phone are valid
  * Updates submit button state accordingly
  */
 function validateForm() {
@@ -84,6 +107,22 @@ function validateForm() {
 
     // Additional email format validation
     if (field.type === "email" && !isValidEmail(value)) {
+      isValid = false;
+    }
+  });
+
+  // Validate all SSN fields (must have 9 digits)
+  const ssnFields = form.querySelectorAll('input[name*="[ssn]"]');
+  ssnFields.forEach((field) => {
+    if (!isValidSSN(field.value)) {
+      isValid = false;
+    }
+  });
+
+  // Validate all phone fields (must have 7+ digits if provided)
+  const phoneFields = form.querySelectorAll('input[name*="[phone]"]');
+  phoneFields.forEach((field) => {
+    if (!isValidPhone(field.value)) {
       isValid = false;
     }
   });
@@ -132,6 +171,195 @@ function handleEmailBlur(e) {
     setFieldInvalid(field, "Please enter a valid email address");
   } else {
     clearFieldInvalid(field);
+  }
+}
+
+/**
+ * Validate SSN field on blur (when user leaves field)
+ */
+function handleSSNBlur(e) {
+  const field = e.target;
+  const value = field.value.trim();
+  
+  if (value && !isValidSSN(value)) {
+    setFieldInvalid(field, "SSN must be exactly 9 digits");
+  } else {
+    clearFieldInvalid(field);
+  }
+}
+
+/**
+ * Validate phone field on blur (when user leaves field)
+ */
+function handlePhoneBlur(e) {
+  const field = e.target;
+  const value = field.value.trim();
+  
+  if (value && !isValidPhone(value)) {
+    setFieldInvalid(field, "Phone must be at least 10 digits");
+  } else {
+    clearFieldInvalid(field);
+  }
+}
+
+/**
+ * Lookup city/state from ZIP code via Salesforce endpoint
+ * Returns array of { city, state, county } objects
+ */
+async function lookupZip(zip) {
+  try {
+    const resp = await fetch(SF_ZIP_ENDPOINT + encodeURIComponent(zip), {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+    
+    if (!resp.ok) return null;
+    
+    const data = await resp.json();
+    if (data.success && data.results && data.results.length > 0) {
+      return data.results;
+    }
+    return null;
+  } catch (err) {
+    console.error("ZIP lookup error:", err);
+    return null;
+  }
+}
+
+/**
+ * Show loading indicator on ZIP field
+ */
+function showZipLoading(zipField) {
+  const wrapper = zipField.closest('.zip-field');
+  if (!wrapper) return;
+  
+  // Remove existing loader if any
+  const existing = wrapper.querySelector('.zip-loading');
+  if (existing) existing.remove();
+  
+  const loader = document.createElement('div');
+  loader.className = 'zip-loading';
+  wrapper.appendChild(loader);
+}
+
+/**
+ * Hide loading indicator on ZIP field
+ */
+function hideZipLoading(zipField) {
+  const wrapper = zipField.closest('.zip-field');
+  if (!wrapper) return;
+  
+  const loader = wrapper.querySelector('.zip-loading');
+  if (loader) loader.remove();
+}
+
+/**
+ * Show city options dropdown for user selection
+ */
+function showCityOptions(guarantorIndex, options) {
+  const optionsContainer = document.getElementById(`cityOptions_${guarantorIndex}`);
+  if (!optionsContainer) return;
+  
+  // Build options HTML
+  optionsContainer.innerHTML = options.map((opt, idx) => `
+    <div class="city-option" data-index="${idx}" data-city="${opt.city}" data-state="${opt.state}">
+      <div class="city-option-name">${opt.city}, ${opt.state}</div>
+      ${opt.county ? `<div class="city-option-detail">${opt.county} County</div>` : ''}
+    </div>
+  `).join('');
+  
+  // Add click handlers
+  optionsContainer.querySelectorAll('.city-option').forEach(optEl => {
+    optEl.addEventListener('click', () => {
+      const city = optEl.dataset.city;
+      const state = optEl.dataset.state;
+      selectCityOption(guarantorIndex, city, state);
+    });
+  });
+  
+  optionsContainer.classList.remove('hidden');
+}
+
+/**
+ * Hide city options dropdown
+ */
+function hideCityOptions(guarantorIndex) {
+  const optionsContainer = document.getElementById(`cityOptions_${guarantorIndex}`);
+  if (optionsContainer) {
+    optionsContainer.classList.add('hidden');
+    optionsContainer.innerHTML = '';
+  }
+}
+
+/**
+ * Select a city option and populate fields
+ */
+function selectCityOption(guarantorIndex, city, state) {
+  const cityField = document.getElementById(`city_${guarantorIndex}`);
+  const stateField = document.getElementById(`state_${guarantorIndex}`);
+  
+  if (cityField) cityField.value = city;
+  if (stateField) stateField.value = state;
+  
+  hideCityOptions(guarantorIndex);
+  validateForm();
+}
+
+/**
+ * Handle ZIP field input - trigger lookup when 5 digits entered
+ */
+async function handleZipInput(e) {
+  const field = e.target;
+  const value = field.value.trim();
+  const digitsOnly = value.replace(/\D/g, '');
+  
+  // Extract guarantor index from field ID (zip_1 -> 1)
+  const match = field.id.match(/zip_(\d+)/);
+  if (!match) return;
+  const guarantorIndex = match[1];
+  
+  // Hide any existing city options
+  hideCityOptions(guarantorIndex);
+  
+  // Only lookup when we have 5 digits
+  if (digitsOnly.length < 5) {
+    // Clear city/state if ZIP is incomplete
+    const cityField = document.getElementById(`city_${guarantorIndex}`);
+    const stateField = document.getElementById(`state_${guarantorIndex}`);
+    if (cityField) cityField.value = '';
+    if (stateField) stateField.value = '';
+    validateForm();
+    return;
+  }
+  
+  // Take first 5 digits for lookup
+  const zip5 = digitsOnly.substring(0, 5);
+  
+  showZipLoading(field);
+  
+  const results = await lookupZip(zip5);
+  
+  hideZipLoading(field);
+  
+  if (!results || results.length === 0) {
+    // ZIP not found - show error
+    setFieldInvalid(field, "ZIP code not found");
+    const cityField = document.getElementById(`city_${guarantorIndex}`);
+    const stateField = document.getElementById(`state_${guarantorIndex}`);
+    if (cityField) cityField.value = '';
+    if (stateField) stateField.value = '';
+    validateForm();
+    return;
+  }
+  
+  clearFieldInvalid(field);
+  
+  if (results.length === 1) {
+    // Single result - auto-populate
+    selectCityOption(guarantorIndex, results[0].city, results[0].state);
+  } else {
+    // Multiple results - show selection dropdown
+    showCityOptions(guarantorIndex, results);
   }
 }
 
@@ -227,6 +455,7 @@ function createGuarantorHTML(index) {
           inputmode="numeric"
           autocomplete="off"
           placeholder="123-45-6789"
+          minlength="9"
           required
         />
         <div class="help">Enter 9 digits (dashes optional).</div>
@@ -249,7 +478,8 @@ function createGuarantorHTML(index) {
 
       <div class="field">
         <label for="phone_${index}">Phone</label>
-        <input id="phone_${index}" name="guarantors[${index - 1}][phone]" autocomplete="tel" />
+        <input id="phone_${index}" name="guarantors[${index - 1}][phone]" autocomplete="tel" minlength="10" />
+        <div class="help">Minimum 10 digits if provided.</div>
       </div>
 
       <div class="field">
@@ -297,38 +527,23 @@ function createGuarantorHTML(index) {
         </select>
       </div>
 
-      <div class="field">
+      <div class="field city-select-wrapper">
         <label for="city_${index}">City <span class="req">*</span></label>
-        <input id="city_${index}" name="guarantors[${index - 1}][city]" autocomplete="address-level2" required />
+        <input id="city_${index}" name="guarantors[${index - 1}][city]" autocomplete="off" required readonly />
+        <div class="help">Auto-filled from ZIP code.</div>
+        <div id="cityOptions_${index}" class="city-options hidden"></div>
       </div>
 
       <div class="field">
         <label for="state_${index}">State <span class="req">*</span></label>
-        <select id="state_${index}" name="guarantors[${index - 1}][state]" autocomplete="address-level1" required>
-          <option value="">Select…</option>
-          <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
-          <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
-          <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
-          <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
-          <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
-          <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
-          <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
-          <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
-          <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
-          <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
-          <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
-          <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
-          <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
-          <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
-          <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
-          <option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
-          <option value="WI">WI</option><option value="WY">WY</option>
-        </select>
+        <input id="state_${index}" name="guarantors[${index - 1}][state]" autocomplete="off" required readonly />
+        <div class="help">Auto-filled from ZIP code.</div>
       </div>
 
-      <div class="field">
+      <div class="field zip-field">
         <label for="zip_${index}">ZIP <span class="req">*</span></label>
-        <input id="zip_${index}" name="guarantors[${index - 1}][zip]" inputmode="numeric" autocomplete="postal-code" required />
+        <input id="zip_${index}" name="guarantors[${index - 1}][zip]" inputmode="numeric" autocomplete="postal-code" maxlength="10" required />
+        <div class="help">Enter ZIP to auto-fill city/state.</div>
       </div>
     </div>
   `;
@@ -352,6 +567,12 @@ function addGuarantor() {
   const newEmailField = section.querySelector(`#email_${guarantorCount}`);
   if (newEmailField) {
     newEmailField.addEventListener("blur", handleEmailBlur);
+  }
+  
+  // Attach input listener to new ZIP field for city/state lookup
+  const newZipField = section.querySelector(`#zip_${guarantorCount}`);
+  if (newZipField) {
+    newZipField.addEventListener("input", handleZipInput);
   }
   
   // Re-validate form (new required fields added)
@@ -418,6 +639,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const emailFields = form.querySelectorAll('input[type="email"]');
   emailFields.forEach((field) => {
     field.addEventListener("blur", handleEmailBlur);
+  });
+
+  // ZIP input handler for city/state lookup
+  const zipFields = form.querySelectorAll('input[name*="[zip]"]');
+  zipFields.forEach((field) => {
+    field.addEventListener("input", handleZipInput);
+  });
+
+  // Close city options dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest('.city-select-wrapper')) {
+      document.querySelectorAll('.city-options').forEach(opt => {
+        opt.classList.add('hidden');
+      });
+    }
   });
 
   // Initial validation check
