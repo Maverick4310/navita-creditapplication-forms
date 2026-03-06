@@ -84,6 +84,41 @@ function isValidPhone(value) {
 }
 
 /**
+ * Validate DOB - if provided, year must start with 19 or 20
+ * Expected format from input[type="date"] is YYYY-MM-DD
+ * Returns true if valid (or empty), false if invalid
+ */
+function isValidDOB(value) {
+  const trimmed = value.trim();
+  if (!trimmed) return true; // DOB is optional
+
+  // Must match YYYY-MM-DD and year must start with 19 or 20
+  const dobRegex = /^(19|20)\d{2}-\d{2}-\d{2}$/;
+  if (!dobRegex.test(trimmed)) {
+    return false;
+  }
+
+  // Extra safety: confirm it is a real date
+  const date = new Date(trimmed + "T00:00:00");
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+
+  const [year, month, day] = trimmed.split("-").map(Number);
+
+  // Verify parsed date matches input parts
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() + 1 !== month ||
+    date.getDate() !== day
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Check if all required fields are filled and emails/SSN/phone are valid
  * Updates submit button state accordingly
  */
@@ -124,6 +159,14 @@ function validateForm() {
   const phoneFields = form.querySelectorAll('input[name*="[phone]"]');
   phoneFields.forEach((field) => {
     if (!isValidPhone(field.value)) {
+      isValid = false;
+    }
+  });
+
+  // Validate all DOB fields (must start with 19 or 20 if provided)
+  const dobFields = form.querySelectorAll('input[name*="[dateOfBirth]"]');
+  dobFields.forEach((field) => {
+    if (!isValidDOB(field.value)) {
       isValid = false;
     }
   });
@@ -198,6 +241,20 @@ function handlePhoneBlur(e) {
   
   if (value && !isValidPhone(value)) {
     setFieldInvalid(field, "Phone must be at least 10 digits");
+  } else {
+    clearFieldInvalid(field);
+  }
+}
+
+/**
+ * Validate DOB field on blur
+ */
+function handleDOBBlur(e) {
+  const field = e.target;
+  const value = field.value.trim();
+
+  if (value && !isValidDOB(value)) {
+    setFieldInvalid(field, "Birth year must begin with 19 or 20");
   } else {
     clearFieldInvalid(field);
   }
@@ -578,6 +635,12 @@ function addGuarantor() {
   if (newEmailField) {
     newEmailField.addEventListener("blur", handleEmailBlur);
   }
+
+  // Attach blur listener to new DOB field for validation
+  const newDOBField = section.querySelector(`#dateOfBirth_${guarantorCount}`);
+  if (newDOBField) {
+    newDOBField.addEventListener("blur", handleDOBBlur);
+  }
   
   // Attach input listener to new ZIP field for city/state lookup
   const newZipField = section.querySelector(`#zip_${guarantorCount}`);
@@ -651,6 +714,12 @@ document.addEventListener("DOMContentLoaded", () => {
     field.addEventListener("blur", handleEmailBlur);
   });
 
+  // DOB blur validation for visual feedback
+  const dobFields = form.querySelectorAll('input[name*="[dateOfBirth]"]');
+  dobFields.forEach((field) => {
+    field.addEventListener("blur", handleDOBBlur);
+  });
+
   // ZIP input handler for city/state lookup
   const zipFields = form.querySelectorAll('input[name*="[zip]"]');
   zipFields.forEach((field) => {
@@ -681,6 +750,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btn) {
       btn.disabled = true;
       btn.textContent = "Submitting...";
+    }
+
+    const dobFields = form.querySelectorAll('input[name*="[dateOfBirth]"]');
+    let hasInvalidDOB = false;
+
+    dobFields.forEach((field) => {
+      if (!isValidDOB(field.value)) {
+        setFieldInvalid(field, "Birth year must begin with 19 or 20");
+        hasInvalidDOB = true;
+      }
+    });
+
+    if (hasInvalidDOB) {
+      setBanner("err", "Please correct the invalid date of birth before submitting.");
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+      return;
     }
 
     try {
