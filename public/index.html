@@ -423,12 +423,14 @@
 
                 <div class="field">
                   <label for="dateOfBirth_1">Date of Birth</label>
-                  <input
-                    id="dateOfBirth_1"
-                    name="guarantors[0][dateOfBirth]"
-                    type="date"
-                    autocomplete="bday"
-                  />
+              <input
+  id="dateOfBirth_1"
+  name="guarantors[0][dateOfBirth]"
+  type="date"
+  autocomplete="bday"
+  min="1900-01-01"
+  max="2099-12-31"
+/>
                 </div>
 
                 <div class="field">
