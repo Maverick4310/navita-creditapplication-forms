@@ -530,12 +530,14 @@ function createGuarantorHTML(index) {
 
       <div class="field">
         <label for="dateOfBirth_${index}">Date of Birth</label>
-        <input
-          id="dateOfBirth_${index}"
-          name="guarantors[${index - 1}][dateOfBirth]"
-          type="date"
-          autocomplete="bday"
-        />
+<input
+  id="dateOfBirth_${index}"
+  name="guarantors[${index - 1}][dateOfBirth]"
+  type="date"
+  autocomplete="bday"
+  min="1900-01-01"
+  max="2099-12-31"
+/>
       </div>
 
       <div class="field">
